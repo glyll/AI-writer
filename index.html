@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<script async src="https://cse.baidu.com/cse_plugin/js/baidu_cse.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI短视频文案生成器 - 专业版</title>
+  <meta name="keywords" content="AI文案生成器,短视频文案,抖音文案,小红书文案,短剧脚本">
+  <meta name="description" content="AI一键生成短视频文案，支持多平台多风格，历史记录收藏、编辑、导出、复用，免费在线工具">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    :root{--primary:#165DFF;--success:#00B42A;--warning:#FF7D00;--danger:#F53F3F;--gray:#86909c;--border:#e5e6eb;--bg:#f5f7fa;--card:#fff}
+    body{background:var(--bg);color:#1d2129;padding:20px;min-height:100vh}
+    .container{max-width:900px;margin:0 auto}
+
+    /* 顶部搜索条 */
+    .top-search{display:flex;gap:8px;margin-bottom:20px;align-items:center}
+    .top-search input{flex:1;padding:12px 14px;border:1px solid var(--border);border-radius:12px;font-size:15px}
+    .top-search button{padding:12px 18px;background:#2386EF;color:white;border:none;border-radius:12px;cursor:pointer}
+
+    /* AI快捷入口 */
+    .ai-quick{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:22px}
+    .ai-item{background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:.2s}
+    .ai-item:hover{border-color:var(--primary);background:#eff4ff}
+    .ai-item img{width:24px;height:24px;margin-bottom:6px}
+
+    .header{text-align:center;margin-bottom:20px}
+    .header h1{font-size:26px;color:var(--primary);margin-bottom:6px}
+    .header p{color:var(--gray)}
+    .card{background:var(--card);border-radius:16px;padding:24px;box-shadow:0 4px 20px rgba(0,0,0,.06);margin-bottom:20px}
+    .form-group{margin-bottom:16px}
+    .form-group label{display:block;font-weight:600;margin-bottom:6px;font-size:14px}
+    textarea{width:100%;height:120px;border:1px solid var(--border);border-radius:12px;padding:14px;font-size:15px;resize:none;outline:none}
+    textarea:focus{border-color:var(--primary)}
+    .grid-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+    select{width:100%;padding:12px;border-radius:10px;border:1px solid var(--border);font-size:14px;background:#fff}
+    .btn{width:100%;padding:14px;border-radius:12px;font-size:16px;font-weight:600;border:none;cursor:pointer}
+    .btn-primary{background:var(--primary);color:#fff}
+    .btn-sm{padding:6px 10px;font-size:13px;border-radius:8px;border:none;cursor:pointer;margin-left:6px}
+    .btn-success{background:var(--success);color:#fff}
+    .btn-warning{background:var(--warning);color:#fff}
+    .btn-danger{background:var(--danger);color:#fff}
+    .loading{text-align:center;padding:20px;color:var(--gray)}
+    .spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 8px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .result-card{background:#f8f9fa;border-radius:12px;padding:16px;margin-top:20px}
+    .result-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .result-header h3{font-size:16px}
+    .btn-copy{background:var(--success);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer}
+    .result-content{white-space:pre-line;line-height:1.7;font-size:14px}
+    .ad-slot{background:#fef7e0;border-radius:12px;padding:12px;text-align:center;font-size:13px;color:#666;margin:16px 0}
+    .tip{text-align:center;color:var(--gray);font-size:12px;margin-top:10px}
+
+    .history-toolbar{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+    .history-search{flex:1;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:14px}
+    .history-filter{padding:8px;border-radius:8px;border:1px solid var(--border)}
+    .history-batch{display:flex;gap:8px;margin-bottom:10px}
+    .history-item{display:flex;align-items:center;background:#f1f5ff;border-radius:8px;padding:10px;margin-bottom:8px}
+    .history-item input{margin-right:8px}
+    .history-body{flex:1;cursor:pointer}
+    .history-title{font-weight:500;margin-bottom:4px;font-size:14px}
+    .history-time{font-size:12px;color:var(--gray)}
+    .history-actions{display:flex;gap:4px}
+    .history-empty{text-align:center;color:var(--gray);padding:20px 0}
+    .star{color:#FF7D00;margin-right:6px}
+  </style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- 百度搜索条 -->
+  <div class="top-search">
+    <input type="text" id="baiduInput" placeholder="百度搜索文案/教程/素材...">
+    <button onclick="toBaidu()">百度搜索</button>
+  </div>
+
+  <!-- 主流AI快捷入口 -->
+  <div class="ai-quick">
+    <div class="ai-item" onclick="openAI('https://www.doubao.com')">豆包</div>
+    <div class="ai-item" onclick="openAI('https://dashscope.aliyun.com')">通义千问</div>
+    <div class="ai-item" onclick="openAI('https://kimi.moonshot.cn')">Kimi</div>
+    <div class="ai-item" onclick="openAI('https://yiyan.baidu.com')">文心一言</div>
+    <div class="ai-item" onclick="openAI('https://chat.openai.com')">ChatGPT</div>
+    <div class="ai-item" onclick="openAI('https://lingyiwanwu.com')">零一万物</div>
+  </div>
+
+  <div class="header">
+    <h1>AI短视频文案生成器</h1>
+    <p>多风格｜历史收藏｜编辑导出｜一键复用</p>
+  </div>
+
+  <div class="card">
+    <div class="form-group">
+      <label>📝 主题/关键词</label>
+      <textarea id="topic" placeholder="例如：职场逆袭、情感治愈、好物推荐、短剧反转"></textarea>
+    </div>
+
+    <div class="grid-row">
+      <div class="form-group"><label>📱 平台</label><select id="platform"><option value="抖音">抖音</option><option value="小红书">小红书</option><option value="视频号">视频号</option><option value="快手">快手</option></select></div>
+      <div class="form-group"><label>✨ 风格</label><select id="style"><option value="爆款">爆款引流</option><option value="干货">知识干货</option><option value="情感">情感共鸣</option><option value="短剧">短剧反转</option><option value="种草">好物种草</option></select></div>
+      <div class="form-group"><label>⏱️ 时长</label><select id="duration"><option value="15s">15秒</option><option value="30s">30秒</option><option value="60s">60秒</option></select></div>
+      <div class="form-group"><label>🧠 模型</label><select id="model"><option value="tongyi">通义千问</option><option value="mock">演示模式</option></select></div>
+    </div>
+
+    <button class="btn btn-primary" onclick="generate()">🚀 一键生成AI文案</button>
+
+    <div class="ad-slot">
+  <div style="background:#f6f7f9;padding:14px;border-radius:12px;text-align:center;margin:16px 0;font-size:14px;color:#666">
+  <a href="https://www.baidu.com" style="color:#1677ff;text-decoration:none;">广告：百度一下，你就知道</a>
+</div>
+  </div>
+</div>
+    <div class="loading" id="loading" style="display:none">
+      <div class="spinner"></div><p>AI正在生成，请稍候...</p>
+    </div>
+
+    <div class="result-card" id="resultCard" style="display:none">
+      <div class="result-header">
+        <h3>生成结果</h3>
+        <button class="btn-copy" onclick="copyResult()">📋 复制</button>
+      </div>
+      <div class="result-content" id="resultContent"></div>
+    </div>
+
+    <!-- 历史记录 -->
+    <div style="margin-top:24px">
+      <div class="result-header"><h3>历史记录</h3></div>
+      <div class="history-toolbar">
+        <input type="text" class="history-search" id="search" placeholder="搜索关键词..." oninput="renderHistory()">
+        <select class="history-filter" id="filterDate" onchange="renderHistory()">
+          <option value="all">全部时间</option>
+          <option value="today">今天</option>
+          <option value="7day">近7天</option>
+          <option value="fav">仅收藏</option>
+        </select>
+      </div>
+      <div class="history-batch">
+        <button class="btn-sm btn-warning" onclick="batchDelete()">批量删除</button>
+        <button class="btn-sm btn-success" onclick="batchExport()">批量导出TXT</button>
+      </div>
+      <div id="historyList" class="history-empty">暂无记录</div>
+    </div>
+  </div>
+
+  <div class="tip">输入越详细，生成越精准｜支持SEO收录，可引流变现</div>
+</div>
+
+<script>
+// 百度搜索
+function toBaidu(){
+  const w = document.getElementById("baiduInput").value.trim();
+  if(!w)return alert("请输入搜索内容");
+  window.open("https://www.baidu.com/s?wd="+encodeURIComponent(w));
+}
+
+// 打开AI平台
+function openAI(url){
+  window.open(url);
+}
+
+const AI_CONFIG = {
+  tongyi: {
+    url: "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions",
+    key: "sk-b76ddf168a874e5da0c250771360e181",
+    model: "qwen-turbo"
+  },
+  mock: {}
+};
+
+let historyList = JSON.parse(localStorage.getItem("historyList")) || [];
+let recycleBin = JSON.parse(localStorage.getItem("recycleBin")) || [];
+
+function uid(){return Math.random().toString(36).slice(2,10)}
+
+async function generate(){
+  const topic = document.getElementById("topic").value.trim();
+  const platform = document.getElementById("platform").value;
+  const style = document.getElementById("style").value;
+  const duration = document.getElementById("duration").value;
+  const model = document.getElementById("model").value;
+  if(!topic){alert("请输入主题");return}
+
+  document.getElementById("loading").style.display="block";
+  document.getElementById("resultCard").style.display="none";
+
+  const prompt = `
+你是专业短视频文案师，平台：${platform}，风格：${style}，时长：${duration}，主题：${topic}
+要求：开头抓眼球、结构完整、带3-5个标签、口语化、只输出文案。
+`;
+  let resText = "";
+  try{
+    if(model==="tongyi"){
+      const resp = await fetch(AI_CONFIG.tongyi.url,{
+        method:"POST",
+        headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_CONFIG.tongyi.key},
+        body:JSON.stringify({model:AI_CONFIG.tongyi.model,messages:[{role:"user",content:prompt}]})
+      });
+      const data = await resp.json();
+      resText = data.choices?.[0]?.message?.content || "生成失败";
+    }else{
+      resText = `【${topic}】\n开头：${topic}居然这么好用！\n中间：...\n结尾：点赞收藏\n#${topic} #短视频`;
+    }
+
+    document.getElementById("resultContent").innerText = resText;
+    document.getElementById("resultCard").style.display="block";
+
+    historyList.unshift({
+      id:uid(),topic,platform,style,duration,content:resText,
+      time:new Date().toISOString(),star:false
+    });
+    if(historyList.length>50)historyList=historyList.slice(0,50);
+    localStorage.setItem("historyList",JSON.stringify(historyList));
+    renderHistory();
+  }catch(e){alert("生成失败："+e.message)}
+  finally{document.getElementById("loading").style.display="none"}
+}
+
+function copyResult(){
+  const t=document.getElementById("resultContent").innerText;
+  navigator.clipboard.writeText(t).then(()=>alert("复制成功")).catch(()=>alert("复制失败"));
+}
+
+function renderHistory(){
+  const search = document.getElementById("search").value.toLowerCase();
+  const filter = document.getElementById("filterDate").value;
+  const now = new Date();
+  const list = historyList.filter(item=>{
+    if(search && !item.topic.toLowerCase().includes(search) && !item.content.toLowerCase().includes(search))return false;
+    const t = new Date(item.time);
+    if(filter==="today") return t.toDateString()===now.toDateString();
+    if(filter==="7day") return (now-t)/(1000*60*60*24) <=7;
+    if(filter==="fav") return item.star;
+    return true;
+  });
+  const dom = document.getElementById("historyList");
+  if(list.length===0){dom.innerHTML='<div class="history-empty">暂无记录</div>';return}
+  dom.innerHTML = list.map((item,i)=>`
+    <div class="history-item">
+      <input type="checkbox" class="history-check" data-id="${item.id}">
+      ${item.star?'<span class="star">⭐</span>':''}
+      <div class="history-body" onclick="loadItem(${i})">
+        <div class="history-title">${item.topic}</div>
+        <div class="history-time">${new Date(item.time).toLocaleString()}</div>
+      </div>
+      <div class="history-actions">
+        <button class="btn-sm" onclick="toggleStar(${i})">${item.star?'取消星标':'⭐'}</button>
+        <button class="btn-sm" onclick="reuse(${i})">复用</button>
+        <button class="btn-sm" onclick="editItem(${i})">编辑</button>
+        <button class="btn-sm btn-danger" onclick="deleteToRecycle(${i})">删除</button>
+      </div>
+    </div>
+  `).join("");
+}
+
+function loadItem(index){
+  const item=historyList[index];
+  document.getElementById("resultContent").innerText=item.content;
+  document.getElementById("resultCard").style.display="block";
+}
+
+function reuse(index){
+  const item=historyList[index];
+  document.getElementById("topic").value=item.topic;
+  document.getElementById("platform").value=item.platform;
+  document.getElementById("style").value=item.style;
+  document.getElementById("duration").value=item.duration;
+  alert("已回填参数，可直接重新生成");
+}
+
+function toggleStar(index){
+  historyList[index].star=!historyList[index].star;
+  localStorage.setItem("historyList",JSON.stringify(historyList));
+  renderHistory();
+}
+
+function editItem(index){
+  const item=historyList[index];
+  const newText=prompt("编辑文案",item.content);
+  if(newText===null||newText==="")return;
+  historyList[index].content=newText;
+  localStorage.setItem("historyList",JSON.stringify(historyList));
+  renderHistory();
+}
+
+function deleteToRecycle(index){
+  if(!confirm("放入回收站，可恢复"))return;
+  const item = historyList.splice(index,1)[0];
+  recycleBin.push({...item,deleteTime:new Date().toISOString()});
+  if(recycleBin.length>30)recycleBin=recycleBin.slice(-30);
+  localStorage.setItem("historyList",JSON.stringify(historyList));
+  localStorage.setItem("recycleBin",JSON.stringify(recycleBin));
+  renderHistory();
+}
+
+function batchDelete(){
+  const checks = document.querySelectorAll(".history-check:checked");
+  if(checks.length===0){alert("请选择记录");return}
+  if(!confirm("批量移入回收站"))return;
+  const ids = Array.from(checks).map(c=>c.dataset.id);
+  historyList = historyList.filter(item=>!ids.includes(item.id));
+  localStorage.setItem("historyList",JSON.stringify(historyList));
+  renderHistory();
+}
+
+function batchExport(){
+  const checks = document.querySelectorAll(".history-check:checked");
+  let list = historyList;
+  if(checks.length>0){
+    const ids = Array.from(checks).map(c=>c.dataset.id);
+    list=historyList.filter(item=>ids.includes(item.id));
+  }
+  if(list.length===0){alert("无记录可导出");return}
+  const text = list.map((item,i)=>`
+【${i+1}】${item.topic}
+${new Date(item.time).toLocaleString()}
+平台：${item.platform}｜风格：${item.style}｜时长：${item.duration}
+${item.content}
+----------------------------------------
+  `).join("\n");
+  const blob = new Blob([text],{type:"text/plain;charset=utf-8"});
+  const a = document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="文案合集_"+new Date().getTime()+".txt";
+  a.click();
+}
+
+renderHistory();
+</script>
+</body>
+</html>
